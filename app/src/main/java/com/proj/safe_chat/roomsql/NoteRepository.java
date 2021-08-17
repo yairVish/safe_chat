@@ -39,6 +39,15 @@ public class NoteRepository {
         return noteDao.getAllMessages(query);
     }
 
+    public LiveData<Message> getLastMessage(String query){
+        return noteDao.getLastMessage(query);
+    }
+    public LiveData<Message> getLastMessageOfAll(){return noteDao.getLastMessageOfAll();}
+
+    public LiveData<List<Message>> getAllMessagesNotShow(String query) {
+        return noteDao.getAllMessagesNotShow(query);
+    }
+
 
 
     private static class InsertNoteUserAsyncTask extends AsyncTask<NoteUser, Void, Void> {

@@ -6,8 +6,13 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.proj.safe_chat.encrypt.CalculateKey;
 import com.proj.safe_chat.encrypt.Encryption;
+import com.proj.safe_chat.roomsql.Message;
+import com.proj.safe_chat.roomsql.NoteViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +35,7 @@ public class MySocket implements KeysJsonI{
     private boolean isChanged = false;
     private String myKey = "";
     private Context context;
+    private NoteViewModel noteViewModel;
 
 
     public MySocket(Socket socket, Context context) throws Exception {
@@ -38,6 +44,7 @@ public class MySocket implements KeysJsonI{
 
         inputStream = new DataInputStream(socket.getInputStream());
         outputStream = new DataOutputStream(socket.getOutputStream());
+        noteViewModel = ViewModelProviders.of((FragmentActivity) context).get(NoteViewModel.class);
     }
 
     public void send(byte[] bytes) throws Exception {
@@ -100,6 +107,14 @@ public class MySocket implements KeysJsonI{
                 }
             }
             Log.d("TAG", "myKey: "+myKey);
+        }else if(myType.equals("message")){
+            try {
+                noteViewModel.insertMessage(new Message(jsonObject.getString("body")
+                        ,jsonObject.getString("from"),jsonObject.getString("from")
+                        ,false, jsonObject.getLong("time")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         myType = "";
     }

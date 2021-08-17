@@ -1,6 +1,8 @@
 package com.proj.safe_chat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +12,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.proj.safe_chat.adapter.AdapterUsers;
+import com.proj.safe_chat.roomsql.Message;
+import com.proj.safe_chat.roomsql.NoteViewModel;
 import com.proj.safe_chat.tools.KeysJsonI;
 import com.proj.safe_chat.tools.MySocket;
 import com.proj.safe_chat.tools.MySocketSingleton;
@@ -20,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements KeysJsonI {
@@ -30,13 +35,16 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private List<String> uids=new ArrayList<>();
     private List<String> emails=new ArrayList<>();
     private List<User> users = new ArrayList<>();
+    private NoteViewModel noteViewModel;
+    private int lastPosition = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.list_participants);
-        Log.d("TAG", "recyclerView: "+recyclerView);
+        noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
         mySocket = MySocketSingleton.getMySocket();
 
@@ -124,15 +132,18 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     uids = new ArrayList<>();
                     break;
                 }
+            }
                 runOnUiThread(new Runnable() {
                     public void run() {
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
                         recyclerView.setLayoutManager(linearLayoutManager);
-                        AdapterUsers adapterUsers = new AdapterUsers(MainActivity.this, users);
+                        AdapterUsers adapterUsers = new AdapterUsers(MainActivity.this, users
+                        ,getIntent().getExtras().getString("unique_id"));
                         recyclerView.setAdapter(adapterUsers);
                         adapterUsers.setOnItemClickListener(new AdapterUsers.OnItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
+                                lastPosition = position;
                                 MySocketSingleton.setMySocket(mySocket);
                                 Intent intent=new Intent(MainActivity.this,ChatActivity.class);
                                 intent.putExtra("my_name", user.getName());
@@ -144,10 +155,32 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                                 startActivity(intent);
                             }
                         });
-                    }
-                });
 
-            }
+                    noteViewModel.getLastMessageOfAll().observe(MainActivity.this, new Observer<Message>() {
+                        @Override
+                        public void onChanged(Message message) {
+                            if(message==null)
+                                return;
+                            Log.d("TAG", "onChanged3456788: ");
+                            int position = 0;
+                            for (int i = 0; i < users.size(); i++) {
+                                if (users.get(i).getUnique_id().equals(message.getToId())) {
+                                    position = i;
+                                    break;
+                                }
+                            }
+                            if (position != 0 && position < users.size()) {
+                                for (int i = position; i > 0; i--) {
+                                    Collections.swap(users, i, i - 1);
+                                    adapterUsers.notifyItemMoved(i, i - 1);
+                                    adapterUsers.notifyItemChanged(i, Boolean.FALSE);
+                                    adapterUsers.notifyItemChanged(i - 1, Boolean.FALSE);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
         }
     }
 }

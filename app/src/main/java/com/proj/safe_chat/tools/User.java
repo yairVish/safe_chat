@@ -1,5 +1,7 @@
 package com.proj.safe_chat.tools;
 
+import androidx.annotation.NonNull;
+
 public class User {
     private String name;
     private String unique_id;
@@ -43,5 +45,14 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
