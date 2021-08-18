@@ -11,6 +11,7 @@ public interface KeysJsonI {
     String TO_KEY = "to";
     String BODY_KEY = "body";
     String TIME_KEY = "time";
+    String TOKEN_KEY = "token";
 
 
 

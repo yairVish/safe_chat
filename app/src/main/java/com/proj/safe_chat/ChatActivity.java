@@ -1,5 +1,7 @@
 package com.proj.safe_chat;
 
+import static com.proj.safe_chat.tools.MySocket.idChat;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
@@ -16,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.proj.safe_chat.adapter.AdapterMessage;
+import com.proj.safe_chat.firebase_noti.Data;
+import com.proj.safe_chat.firebase_noti.SendNotification;
 import com.proj.safe_chat.roomsql.Message;
 import com.proj.safe_chat.roomsql.NoteViewModel;
 import com.proj.safe_chat.tools.KeysJsonI;
@@ -28,6 +32,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import static com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig.activeChat;
+import static com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig.idUser;
 
 public class ChatActivity extends AppCompatActivity implements KeysJsonI {
     private TextView textUsername;
@@ -128,6 +134,11 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
                             public void run(){
                                 try {
                                     mySocket.send(jsonObject.toString().getBytes());
+                                    Data data = new Data(jsonObject.getString("type")
+                                            , jsonObject.getString("from"), jsonObject.getString("to")
+                                            ,getIntent().getStringExtra("my_name"));
+                                    String other_token = getIntent().getStringExtra("other_token");
+                                    new SendNotification(other_token, data).sendNotification();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -139,5 +150,21 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        idChat=getIntent().getExtras().getString("other_unique_id");
+        idUser=getIntent().getExtras().getString("other_unique_id");
+        activeChat=true;
+        Log.d("TAG", "idChat: "+idChat);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        activeChat=false;
+        idChat="";
     }
 }

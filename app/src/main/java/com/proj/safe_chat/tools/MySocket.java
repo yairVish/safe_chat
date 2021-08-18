@@ -38,6 +38,7 @@ public class MySocket implements KeysJsonI{
     private String myKey = "";
     private Context context;
     private NoteViewModel noteViewModel;
+    public static String idChat="";
 
 
     public MySocket(Socket socket, Context context) throws Exception {
@@ -117,7 +118,7 @@ public class MySocket implements KeysJsonI{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }else if (myType.equals("messageOneTime")){
+        }else if (myType.equals(MESSAGE_ONE_TIME_VALUE)){
             List<String> fromIds;
             List<String> toIds;
             List<String> times;

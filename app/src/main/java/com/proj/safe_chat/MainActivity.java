@@ -1,5 +1,6 @@
 package com.proj.safe_chat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -11,6 +12,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.proj.safe_chat.adapter.AdapterUsers;
 import com.proj.safe_chat.roomsql.Message;
 import com.proj.safe_chat.roomsql.NoteViewModel;
@@ -35,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private List<String> uids=new ArrayList<>();
     private List<String> emails=new ArrayList<>();
     private List<User> users = new ArrayList<>();
+    private List<String> tokens=new ArrayList<>();
     private NoteViewModel noteViewModel;
-    private int lastPosition = 0;
 
 
     @Override
@@ -80,19 +84,40 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     }
 
     private void sendGetAllRequest() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(TYPE_KEY, GET_ALL_VALUE);
-        jsonObject.put(UID_KEY, user.getUnique_id());
-        Thread thread = new Thread(){
-            @Override
-            public void run(){
-                try {
-                    mySocket.send(jsonObject.toString().getBytes());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };thread.start();
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TAG", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put(TYPE_KEY, GET_ALL_VALUE);
+                            jsonObject.put(UID_KEY, user.getUnique_id());
+                            jsonObject.put(TOKEN_KEY, token);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Thread thread = new Thread(){
+                            @Override
+                            public void run(){
+                                try {
+                                    mySocket.send(jsonObject.toString().getBytes());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };thread.start();
+                        Log.d("TAG", "token: "+token);
+                    }
+                });
     }
 
     private void receive(byte[] bytes) throws JSONException {
@@ -118,6 +143,11 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
             str = singleStr.split(",");
             emails = Arrays.asList(str);
 
+            singleStr=jsonObject.getString("tokens")
+                    .substring(1, jsonObject.getString("tokens").length()-1);
+            str = singleStr.split(",");
+            tokens=Arrays.asList(str);
+
             Log.d("TAG", "uids: " + uids.size());
             for (int i = 0; i < uids.size(); i++) {
                 try {
@@ -127,7 +157,9 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     names.set(i, s);
                     s = emails.get(i).substring(1, emails.get(i).length() - 1);
                     emails.set(i, s);
-                    users.add(new User(names.get(i), uids.get(i), emails.get(i), ""));
+                    s = tokens.get(i).substring(1, tokens.get(i).length() - 1);
+                    tokens.set(i, s);
+                    users.add(new User(names.get(i), uids.get(i), emails.get(i), tokens.get(i)));
                 } catch (Exception e) {
                     uids = new ArrayList<>();
                     break;
@@ -143,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                         adapterUsers.setOnItemClickListener(new AdapterUsers.OnItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
-                                lastPosition = position;
                                 MySocketSingleton.setMySocket(mySocket);
                                 Intent intent=new Intent(MainActivity.this,ChatActivity.class);
                                 intent.putExtra("my_name", user.getName());
@@ -152,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                                 intent.putExtra("other_name",users.get(position).getName());
                                 intent.putExtra("other_unique_id",users.get(position).getUnique_id());
                                 intent.putExtra("other_email",users.get(position).getEmail());
+                                intent.putExtra("other_token",users.get(position).getToken());
                                 startActivity(intent);
                             }
                         });
