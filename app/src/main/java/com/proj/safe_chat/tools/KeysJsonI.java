@@ -23,4 +23,5 @@ public interface KeysJsonI {
     String ERROR_SIGN_UP_VALUE = "errorSignUp";
     String GET_ALL_VALUE = "getAll";
     String MESSAGE_VALUE = "message";
+    String MESSAGE_ONE_TIME_VALUE = "messageOneTime";
 }

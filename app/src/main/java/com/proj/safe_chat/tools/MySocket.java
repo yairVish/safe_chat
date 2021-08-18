@@ -26,6 +26,8 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MySocket implements KeysJsonI{
     private Socket socket;
@@ -107,7 +109,7 @@ public class MySocket implements KeysJsonI{
                 }
             }
             Log.d("TAG", "myKey: "+myKey);
-        }else if(myType.equals("message")){
+        }else if(myType.equals(MESSAGE_VALUE)){
             try {
                 noteViewModel.insertMessage(new Message(jsonObject.getString("body")
                         ,jsonObject.getString("from"),jsonObject.getString("from")
@@ -115,10 +117,32 @@ public class MySocket implements KeysJsonI{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }else if (myType.equals("messageOneTime")){
+            List<String> fromIds;
+            List<String> toIds;
+            List<String> times;
+            List<String> bodys;
+            toIds = splitArrayByFiled("to", jsonObject);
+            fromIds = splitArrayByFiled("from", jsonObject);
+            times = splitArrayByFiled("time", jsonObject);
+            bodys = splitArrayByFiled("body", jsonObject);
+            Log.d("TAG", "toIds: "+toIds);
+            Log.d("TAG", "fromIds: "+fromIds);
+            Log.d("TAG", "times: "+times);
+            Log.d("TAG", "bodys: "+bodys);
+            for(int i=0;i<bodys.size();i++) {
+                String fromS = fromIds.get(i).substring(1,fromIds.get(i).length()-1);
+                noteViewModel.insertMessage(new Message(bodys.get(i).substring(1,bodys.get(i).length()-1), fromS, fromS
+                        ,false,Long.parseLong(times.get(i))));
+            }
         }
         myType = "";
     }
-
+    private List<String> splitArrayByFiled(String filed, JSONObject jsonObject) throws JSONException {
+        String singleStr=jsonObject.getString(filed).substring(1, jsonObject.getString(filed).length()-1);
+        String [] str = singleStr.split(",");
+        return Arrays.asList(str);
+    }
     public byte[] readLast(){
         return this.listOfStreams.get(this.listOfStreams.size() - 1);
     }
