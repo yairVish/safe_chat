@@ -33,15 +33,15 @@ public class NoteViewModel extends AndroidViewModel {
         repository.updateMessage(note);
     }
 
-    public LiveData<List<Message>> getAllMessages(String query){
-        return repository.getAllMessages(query);
+    public LiveData<List<Message>> getAllMessages(String my_uid, String o_uid){
+        return repository.getAllMessages(my_uid, o_uid);
     }
 
-    public LiveData<Message> getLastMessage(String query){
-        return repository.getLastMessage(query);
+    public LiveData<Message> getLastMessage(String my_uid, String o_uid){
+        return repository.getLastMessage(my_uid, o_uid);
     }
-    public LiveData<Message> getLastMessageOfAll(){
-        return repository.getLastMessageOfAll();
+    public LiveData<Message> getLastMessageOfAll(String query){
+        return repository.getLastMessageOfAll(query);
     }
     public LiveData<List<Message>> getAllMessagesNotShow(String query){
         return repository.getAllMessagesNotShow(query);

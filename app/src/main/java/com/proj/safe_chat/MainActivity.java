@@ -8,8 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,11 +39,11 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private MySocket mySocket;
     private User user;
     private RecyclerView recyclerView;
-    private List<String> names=new ArrayList<>();
-    private List<String> uids=new ArrayList<>();
-    private List<String> emails=new ArrayList<>();
+    private List<String> names = new ArrayList<>();
+    private List<String> uids = new ArrayList<>();
+    private List<String> emails = new ArrayList<>();
     private List<User> users = new ArrayList<>();
-    private List<String> tokens=new ArrayList<>();
+    private List<String> tokens = new ArrayList<>();
     private NoteViewModel noteViewModel;
 
 
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.list_participants);
+        Log.d("TAG", "recyclerView: "+recyclerView);
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
         mySocket = MySocketSingleton.getMySocket();
@@ -64,14 +69,14 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
             e.printStackTrace();
         }
 
-        Thread thread = new Thread(){
+        Thread thread = new Thread() {
             @Override
-            public void run(){
-                while(true){
-                    if(mySocket!=null&&mySocket.isChanged()){
+            public void run() {
+                while (true) {
+                    if (mySocket != null && mySocket.isChanged()) {
                         byte[] bytes = mySocket.readLast();
                         try {
-                            Log.d("TAG", "bytesMain: "+new String(bytes));
+                            Log.d("TAG", "bytesMain: " + new String(bytes));
                             receive(bytes);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -80,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     }
                 }
             }
-        };thread.start();
+        };
+        thread.start();
     }
 
     private void sendGetAllRequest() throws JSONException {
@@ -105,17 +111,18 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        Thread thread = new Thread(){
+                        Thread thread = new Thread() {
                             @Override
-                            public void run(){
+                            public void run() {
                                 try {
                                     mySocket.send(jsonObject.toString().getBytes());
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
-                        };thread.start();
-                        Log.d("TAG", "token: "+token);
+                        };
+                        thread.start();
+                        Log.d("TAG", "token: " + token);
                     }
                 });
     }
@@ -143,10 +150,10 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
             str = singleStr.split(",");
             emails = Arrays.asList(str);
 
-            singleStr=jsonObject.getString("tokens")
-                    .substring(1, jsonObject.getString("tokens").length()-1);
+            singleStr = jsonObject.getString("tokens")
+                    .substring(1, jsonObject.getString("tokens").length() - 1);
             str = singleStr.split(",");
-            tokens=Arrays.asList(str);
+            tokens = Arrays.asList(str);
 
             Log.d("TAG", "uids: " + uids.size());
             for (int i = 0; i < uids.size(); i++) {
@@ -165,38 +172,40 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     break;
                 }
             }
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
-                        recyclerView.setLayoutManager(linearLayoutManager);
-                        AdapterUsers adapterUsers = new AdapterUsers(MainActivity.this, users
-                        ,getIntent().getExtras().getString("unique_id"));
-                        recyclerView.setAdapter(adapterUsers);
-                        adapterUsers.setOnItemClickListener(new AdapterUsers.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(int position) {
-                                MySocketSingleton.setMySocket(mySocket);
-                                Intent intent=new Intent(MainActivity.this,ChatActivity.class);
-                                intent.putExtra("my_name", user.getName());
-                                intent.putExtra("my_unique_id", user.getUnique_id());
-                                intent.putExtra("my_email", user.getEmail());
-                                intent.putExtra("other_name",users.get(position).getName());
-                                intent.putExtra("other_unique_id",users.get(position).getUnique_id());
-                                intent.putExtra("other_email",users.get(position).getEmail());
-                                intent.putExtra("other_token",users.get(position).getToken());
-                                startActivity(intent);
-                            }
-                        });
-
-                    noteViewModel.getLastMessageOfAll().observe(MainActivity.this, new Observer<Message>() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
+                    recyclerView.setLayoutManager(linearLayoutManager);
+                    AdapterUsers adapterUsers = new AdapterUsers(MainActivity.this, users
+                            , getIntent().getExtras().getString("unique_id"));
+                    recyclerView.setAdapter(adapterUsers);
+                    adapterUsers.setOnItemClickListener(new AdapterUsers.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(int position) {
+                            MySocketSingleton.setMySocket(mySocket);
+                            Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                            intent.putExtra("my_name", user.getName());
+                            intent.putExtra("my_unique_id", user.getUnique_id());
+                            intent.putExtra("my_email", user.getEmail());
+                            intent.putExtra("other_name", users.get(position).getName());
+                            intent.putExtra("other_unique_id", users.get(position).getUnique_id());
+                            intent.putExtra("other_email", users.get(position).getEmail());
+                            intent.putExtra("other_token", users.get(position).getToken());
+                            startActivity(intent);
+                        }
+                    });
+                    Log.d("TAG", "user.getUnique_id(): "+user.getUnique_id());
+                    noteViewModel.getLastMessageOfAll(user.getUnique_id())
+                            .observe(MainActivity.this, new Observer<Message>() {
                         @Override
                         public void onChanged(Message message) {
-                            if(message==null)
+                            if (message == null)
                                 return;
                             Log.d("TAG", "onChanged3456788: ");
                             int position = 0;
                             for (int i = 0; i < users.size(); i++) {
-                                if (users.get(i).getUnique_id().equals(message.getToId())) {
+                                if (users.get(i).getUnique_id().equals(message.getToId())
+                                        || users.get(i).getUnique_id().equals(message.getFromId())) {
                                     position = i;
                                     break;
                                 }
@@ -213,6 +222,47 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     });
                 }
             });
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit:
+                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+                return true;
+            case R.id.logout:
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(TYPE_KEY, LOGOUT);
+                    jsonObject.put(UID_KEY, user.getUnique_id());
+                    jsonObject.put(TOKEN_KEY, "");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            mySocket.send(jsonObject.toString().getBytes());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };thread.start();
+                noteViewModel.deleteAllNotesUser();
+                startActivity(new Intent(MainActivity.this,StartActivity.class));
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

@@ -72,7 +72,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
             }
         });
         holder.textName.setText(users.get(position).getName());
-        noteViewModel.getLastMessage(users.get(position).getUnique_id())
+        noteViewModel.getLastMessage(myUid, users.get(position).getUnique_id())
                 .observe((LifecycleOwner) context, new Observer<Message>() {
             @Override
             public void onChanged(Message message) {

@@ -27,15 +27,15 @@ public interface NoteDao {
     @Update
     void updateMessage(Message message);
 
-    @Query("SELECT * FROM messages WHERE toId LIKE :query AND show LIKE 0")
+    @Query("SELECT * FROM messages WHERE (toId LIKE :query OR fromId LIKE :query) AND show LIKE 0")
     LiveData<List<Message>> getAllMessagesNotShow(String query);
 
-    @Query("SELECT * FROM messages WHERE toId LIKE :query")
-    LiveData<List<Message>> getAllMessages(String query);
+    @Query("SELECT * FROM messages WHERE (toId LIKE :my_uid AND fromId LIKE :o_uid) OR (toId LIKE :o_uid AND fromId LIKE :my_uid)")
+    LiveData<List<Message>> getAllMessages(String my_uid, String o_uid);
 
-    @Query("SELECT * FROM messages WHERE toId LIKE :query ORDER BY id DESC LIMIT 1")
-    LiveData<Message> getLastMessage(String query);
+    @Query("SELECT * FROM messages WHERE (toId LIKE :my_uid AND fromId LIKE :o_uid) OR (toId LIKE :o_uid AND fromId LIKE :my_uid) ORDER BY id DESC LIMIT 1")
+    LiveData<Message> getLastMessage(String my_uid, String o_uid);
 
-    @Query("SELECT * FROM messages ORDER BY id DESC LIMIT 1")
-    LiveData<Message> getLastMessageOfAll();
+    @Query("SELECT * FROM messages WHERE (toId LIKE :query OR fromId LIKE :query) ORDER BY id DESC LIMIT 1")
+    LiveData<Message> getLastMessageOfAll(String query);
 }

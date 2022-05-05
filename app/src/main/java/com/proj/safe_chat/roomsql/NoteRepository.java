@@ -35,14 +35,14 @@ public class NoteRepository {
         new UpdateMessageAsyncTask(noteDao).execute(message);
     }
 
-    public LiveData<List<Message>> getAllMessages(String query){
-        return noteDao.getAllMessages(query);
+    public LiveData<List<Message>> getAllMessages(String my_uid, String o_uid){
+        return noteDao.getAllMessages(my_uid, o_uid);
     }
 
-    public LiveData<Message> getLastMessage(String query){
-        return noteDao.getLastMessage(query);
+    public LiveData<Message> getLastMessage(String my_uid, String o_uid){
+        return noteDao.getLastMessage(my_uid, o_uid);
     }
-    public LiveData<Message> getLastMessageOfAll(){return noteDao.getLastMessageOfAll();}
+    public LiveData<Message> getLastMessageOfAll(String query){return noteDao.getLastMessageOfAll(query);}
 
     public LiveData<List<Message>> getAllMessagesNotShow(String query) {
         return noteDao.getAllMessagesNotShow(query);

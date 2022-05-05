@@ -81,7 +81,7 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
             }
         });
 
-        noteViewModel.getAllMessages(o_uid).observe(ChatActivity.this, new Observer<List<Message>>() {
+        noteViewModel.getAllMessages(my_uid, o_uid).observe(ChatActivity.this, new Observer<List<Message>>() {
             @Override
             public void onChanged(List<Message> messages) {
                 Log.d("TAG", "onChanged: ");

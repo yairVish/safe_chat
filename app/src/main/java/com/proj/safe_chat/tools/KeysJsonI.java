@@ -13,7 +13,7 @@ public interface KeysJsonI {
     String TIME_KEY = "time";
     String TOKEN_KEY = "token";
 
-
+    //////////////////////////////////////////////////////////////////////////////////////
 
     String SIGN_IN_SEND_VALUE = "signIn";
     String SIGN_UP_SEND_VALUE = "signUp";
@@ -23,6 +23,7 @@ public interface KeysJsonI {
     String SUCCESS_SIGN_UP_VALUE = "successSignUp";
     String ERROR_SIGN_UP_VALUE = "errorSignUp";
     String GET_ALL_VALUE = "getAll";
+    String LOGOUT = "logout";
     String MESSAGE_VALUE = "message";
     String MESSAGE_ONE_TIME_VALUE = "messageOneTime";
 }

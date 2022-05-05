@@ -113,7 +113,7 @@ public class MySocket implements KeysJsonI{
         }else if(myType.equals(MESSAGE_VALUE)){
             try {
                 noteViewModel.insertMessage(new Message(jsonObject.getString("body")
-                        ,jsonObject.getString("from"),jsonObject.getString("from")
+                        ,jsonObject.getString("to"),jsonObject.getString("from")
                         ,false, jsonObject.getLong("time")));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -133,7 +133,8 @@ public class MySocket implements KeysJsonI{
             Log.d("TAG", "bodys: "+bodys);
             for(int i=0;i<bodys.size();i++) {
                 String fromS = fromIds.get(i).substring(1,fromIds.get(i).length()-1);
-                noteViewModel.insertMessage(new Message(bodys.get(i).substring(1,bodys.get(i).length()-1), fromS, fromS
+                String toS = toIds.get(i).substring(1,toIds.get(i).length()-1);
+                noteViewModel.insertMessage(new Message(bodys.get(i).substring(1,bodys.get(i).length()-1), toS, fromS
                         ,false,Long.parseLong(times.get(i))));
             }
         }

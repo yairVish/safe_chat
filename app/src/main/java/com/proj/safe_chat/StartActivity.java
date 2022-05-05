@@ -51,7 +51,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("192.168.5.59", 5644);
+                    Socket socket = new Socket("192.168.5.60", 5644);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){
@@ -138,46 +138,46 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
     }
 
     private void setDialog(){
-            final AlertDialog.Builder mBuilder = new AlertDialog.Builder(StartActivity.this);
-            final View mView = LayoutInflater.from(StartActivity.this).inflate(R.layout.sign_up_dialog, null);
-            EditText editTextName =mView.findViewById(R.id.edit_text_name);
-            EditText editTextNPass =mView.findViewById(R.id.edit_text_pass);
-            EditText editTextEmail =mView.findViewById(R.id.edit_text_email);
-            Button dBtnSignUp=mView.findViewById(R.id.btn_sign_up);
-            mBuilder.setView(mView);
-            final AlertDialog dialog = mBuilder.create();
-            dialog.show();
+        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(StartActivity.this);
+        final View mView = LayoutInflater.from(StartActivity.this).inflate(R.layout.sign_up_dialog, null);
+        EditText editTextName =mView.findViewById(R.id.edit_text_name);
+        EditText editTextNPass =mView.findViewById(R.id.edit_text_pass);
+        EditText editTextEmail =mView.findViewById(R.id.edit_text_email);
+        Button dBtnSignUp=mView.findViewById(R.id.btn_sign_up);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
 
-            dBtnSignUp.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void onClick(View v) {
-                    String pass=editTextNPass.getText().toString();
-                    JSONObject obj = new JSONObject();
-                    try {
-                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                        byte[] hash = digest.digest(pass.getBytes(StandardCharsets.UTF_8));
-                        String sHash= Base64.encodeToString(hash, Base64.DEFAULT);
-                        Log.d("TAG", "sHash: "+sHash);
-                        obj.put(TYPE_KEY, SIGN_UP_SEND_VALUE);
-                        obj.put(NAME_KEY, editTextName.getText().toString());
-                        obj.put(PASSWORD_KEY, sHash);
-                        obj.put(EMAIL_KEY, editTextEmail.getText().toString());
-                        noteViewModel.deleteAllNotesUser();
-                        noteViewModel.insertUser(new NoteUser(editTextEmail.getText().toString(), sHash));
-                        Thread thread = new Thread(){
-                            @Override
-                            public void run(){
-                                try {
-                                    mySocket.send(obj.toString().getBytes());
-                                } catch (Exception e) {e.printStackTrace();}
-                            }
-                        };thread.start();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        dBtnSignUp.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+                String pass=editTextNPass.getText().toString();
+                JSONObject obj = new JSONObject();
+                try {
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    byte[] hash = digest.digest(pass.getBytes(StandardCharsets.UTF_8));
+                    String sHash= Base64.encodeToString(hash, Base64.DEFAULT);
+                    Log.d("TAG", "sHash: "+sHash);
+                    obj.put(TYPE_KEY, SIGN_UP_SEND_VALUE);
+                    obj.put(NAME_KEY, editTextName.getText().toString());
+                    obj.put(PASSWORD_KEY, sHash);
+                    obj.put(EMAIL_KEY, editTextEmail.getText().toString());
+                    noteViewModel.deleteAllNotesUser();
+                    noteViewModel.insertUser(new NoteUser(editTextEmail.getText().toString(), sHash));
+                    Thread thread = new Thread(){
+                        @Override
+                        public void run(){
+                            try {
+                                mySocket.send(obj.toString().getBytes());
+                            } catch (Exception e) {e.printStackTrace();}
+                        }
+                    };thread.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            });
+            }
+        });
     }
 
     private void receive(byte[] bytes) throws JSONException {
