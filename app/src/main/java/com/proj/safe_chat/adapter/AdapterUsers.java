@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -15,22 +16,31 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.proj.safe_chat.MainActivity;
 import com.proj.safe_chat.R;
 import com.proj.safe_chat.roomsql.Message;
 import com.proj.safe_chat.roomsql.NoteViewModel;
+import com.proj.safe_chat.tools.KeysJsonI;
+import com.proj.safe_chat.tools.MySocket;
+import com.proj.safe_chat.tools.MySocketSingleton;
 import com.proj.safe_chat.tools.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
+public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> implements KeysJsonI {
     private Context context;
     private List<User> users;
     private OnItemClickListener mListener;
     private NoteViewModel noteViewModel;
     private String myUid;
+    private MySocket mySocket;
 
     public interface OnItemClickListener{
         void onItemClick(int position);
@@ -44,6 +54,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
         this.context = context;
         this.users = users;
         this.myUid=myUid;
+        mySocket = MySocketSingleton.getMySocket();
         noteViewModel= ViewModelProviders.of((FragmentActivity) context).get(NoteViewModel.class);
     }
     @Override
@@ -53,6 +64,29 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
     }
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position){
+        mySocket.setOnReceiveJson(new MySocket.OnReceiveJson() {
+            @Override
+            public void onReceive(JSONObject jsonObject) {
+
+            }
+        });
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(TYPE_KEY, GET_IMAGE);
+            jsonObject.put(UID_KEY, users.get(position).getUnique_id());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    mySocket.send(jsonObject.toString().getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };thread.start();
         noteViewModel.getAllMessagesNotShow(users.get(position).getUnique_id())
                 .observe((LifecycleOwner) context, new Observer<List<Message>>() {
             @Override
@@ -125,6 +159,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView textName,textEmail,badgeText;
+        public ImageView profileImage;
         public LinearLayout badgeBack;
         public ViewHolder(View itemView, OnItemClickListener listener){
             super(itemView);
@@ -132,6 +167,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder>{
             textEmail=itemView.findViewById(R.id.email);
             badgeText=itemView.findViewById(R.id.badge_text);
             badgeBack=itemView.findViewById(R.id.badge_back);
+            profileImage = itemView.findViewById(R.id.profile_image);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -236,7 +236,11 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.edit:
-                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+                Intent intent = new Intent(MainActivity.this, EditProfileActivity.class);
+                intent.putExtra("uid", user.getUnique_id());
+                intent.putExtra("name", user.getName());
+                intent.putExtra("email", user.getEmail());
+                startActivity(intent);
                 return true;
             case R.id.logout:
                 JSONObject jsonObject = new JSONObject();

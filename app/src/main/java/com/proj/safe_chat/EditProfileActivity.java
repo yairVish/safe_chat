@@ -1,15 +1,22 @@
 package com.proj.safe_chat;
 
+import static com.proj.safe_chat.tools.KeysJsonI.TYPE_KEY;
+
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -18,30 +25,91 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.oginotihiro.cropview.CropUtil;
-import com.oginotihiro.cropview.CropView;
+import com.proj.safe_chat.tools.KeysJsonI;
 import com.proj.safe_chat.tools.MyCameraApi;
+import com.proj.safe_chat.tools.MySocket;
+import com.proj.safe_chat.tools.MySocketSingleton;
 import com.yalantis.ucrop.UCrop;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class EditProfileActivity extends AppCompatActivity {
+public class EditProfileActivity extends AppCompatActivity implements KeysJsonI {
     private final int PICK_IMAGE_REQUEST = 2004;
-    private ImageView profileImage;
+    private CircleImageView profileImage;
     private MyCameraApi cameraApi;
+    private EditText editName, editEmail;
+    private Button btnEdit;
+    private int i = 0;
+    private MySocket mySocket;
+    private final String TAG = getClass().getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
         profileImage = findViewById(R.id.profile_image);
+        editName = findViewById(R.id.edit_text_name);
+        editEmail = findViewById(R.id.edit_text_email);
+        btnEdit = findViewById(R.id.btn_edit);
+
+
+        Log.d("TAG", "help11111: ");
+        mySocket = MySocketSingleton.getMySocket();
+        editName.setText(getIntent().getExtras().getString("name"));
+        editEmail.setText(getIntent().getExtras().getString("email"));
+
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onProfileImage();
             }
         });
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onEdit();
+            }
+        });
+    }
+
+    private void onEdit() {
+        Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        String base64Image= android.util.Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(TYPE_KEY, EDIT_VALUE);
+            jsonObject.put(UID_KEY, getIntent().getExtras().getString("uid"));
+            jsonObject.put(EMAIL_KEY, editEmail.getText().toString().trim());
+            jsonObject.put(NAME_KEY, editName.getText().toString());
+            jsonObject.put(IMAGE_KEY, base64Image);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Log.d(TAG, "jsonObject.toString(): "+jsonObject.toString());
+                    mySocket.send(jsonObject.toString().getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
     }
 
     private void onProfileImage(){
@@ -53,16 +121,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 "Camera",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //openCamera(REQUEST_CODE2);
-                        /*if (ContextCompat
-                                .checkSelfPermission(EditAddCard.this, Manifest.permission.CAMERA)
-                                == PackageManager.PERMISSION_DENIED) {
-                            ActivityCompat
-                                    .requestPermissions(EditAddCard.this,
-                                            new String[]{Manifest.permission.CAMERA}, 123);
-                        } else {
-                            //dispatchTakePictureIntent(REQUEST_CODE);
-                        }*/
                         cameraApi = new MyCameraApi(EditProfileActivity.this);
                         cameraApi.film(PICK_IMAGE_REQUEST);
                         dialog.cancel();
@@ -108,27 +166,34 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK) {
+            Log.d("TAG", "yeye1: "+requestCode);
             switch (requestCode) {
                 case PICK_IMAGE_REQUEST:
-                    Uri selectedImageUri = null;
-                    if(data != null)
-                        selectedImageUri = data.getData();
-                    if(selectedImageUri==null) {
-                        Bitmap photo = BitmapFactory.decodeFile(cameraApi.getCurrentPhotoPath());
-                        // = (Bitmap) data.getExtras().get("data");
-                        //selectedImageUri = getImageUri(getApplicationContext(), photo);
+                    Uri mImageUri = null;
+                    if(data!=null) {
+                        mImageUri = data.getData();
                     }
-                    if (null != selectedImageUri) {
-                        String nns = "sample";
+                        if(mImageUri == null){
+                            Bitmap photo = BitmapFactory.decodeFile(cameraApi.getCurrentPhotoPath());
+                            mImageUri = cameraApi.getImageUri(getApplicationContext(), photo);
+                        }
+                        String nns = "sample"+i;
                         nns += ".jpg";
-                        UCrop.of(selectedImageUri, Uri.fromFile(new File(getCacheDir(), nns)))
+                        UCrop.of(mImageUri, Uri.fromFile(new File(getCacheDir(), nns)))
                                 .withAspectRatio(1, 1)
                                 .start(this);
-                    }
+                        i++;
                     break;
                 case UCrop.REQUEST_CROP:
                     final Uri resultUri = UCrop.getOutput(data);
-                    profileImage.setImageURI(resultUri);
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
+                        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,320,320, true);
+                        profileImage.setImageBitmap(bitmapResized);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("TAG", "yeye3: "+resultUri);
                     break;
             }
         }

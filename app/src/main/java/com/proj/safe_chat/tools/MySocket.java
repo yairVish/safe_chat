@@ -38,7 +38,12 @@ public class MySocket implements KeysJsonI{
     private String myKey = "";
     private Context context;
     private NoteViewModel noteViewModel;
+    private OnReceiveJson onReceiveJson;
     public static String idChat="";
+
+    public interface OnReceiveJson{
+        void onReceive(JSONObject jsonObject);
+    }
 
 
     public MySocket(Socket socket, Context context) throws Exception {
@@ -54,6 +59,8 @@ public class MySocket implements KeysJsonI{
         Log.d("TAG", "myKey24: "+myKey);
         if(!myKey.equals("")) {
             final byte[] encrypted_bytes = new Encryption(myKey).encrypt(bytes);
+            Log.d("TAG", "encrypted_bytes, Base64.DEFAULT).getBytes().length: "+
+                    Base64.encodeToString(encrypted_bytes, Base64.DEFAULT).getBytes().length);
             outputStream.write(ByteBuffer.allocate(4)
                     .putInt(Base64.encodeToString(encrypted_bytes, Base64.DEFAULT).getBytes().length).array());
             outputStream.write(Base64.encodeToString(encrypted_bytes, Base64.DEFAULT).getBytes());
@@ -92,6 +99,8 @@ public class MySocket implements KeysJsonI{
     }
 
     private void conditionsByJson(JSONObject jsonObject) throws Exception {
+        if(onReceiveJson!=null)
+            onReceiveJson.onReceive(jsonObject);
         String myType = (String) jsonObject.get(TYPE_KEY);
         if(myType.equals(P_AND_A_VALUE)){
             JSONObject jsonMyPublicKey;
@@ -159,6 +168,11 @@ public class MySocket implements KeysJsonI{
 
     public void setChanged(boolean changed) {
         isChanged = changed;
+    }
+
+
+    public void setOnReceiveJson(OnReceiveJson onReceiveJson) {
+        this.onReceiveJson = onReceiveJson;
     }
 
     public boolean isJson(String test) {

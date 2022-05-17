@@ -12,6 +12,7 @@ public interface KeysJsonI {
     String BODY_KEY = "body";
     String TIME_KEY = "time";
     String TOKEN_KEY = "token";
+    String IMAGE_KEY = "image";
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,4 +27,6 @@ public interface KeysJsonI {
     String LOGOUT = "logout";
     String MESSAGE_VALUE = "message";
     String MESSAGE_ONE_TIME_VALUE = "messageOneTime";
+    String EDIT_VALUE = "edit";
+    String GET_IMAGE = "getImage";
 }
