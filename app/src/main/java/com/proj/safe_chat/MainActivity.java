@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -179,6 +182,12 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     AdapterUsers adapterUsers = new AdapterUsers(MainActivity.this, users
                             , getIntent().getExtras().getString("unique_id"));
                     recyclerView.setAdapter(adapterUsers);
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //setProfiles(adapterUsers);
+                        }
+                    });thread.start();
                     adapterUsers.setOnItemClickListener(new AdapterUsers.OnItemClickListener() {
                         @Override
                         public void onItemClick(int position) {
@@ -222,6 +231,30 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                     });
                 }
             });
+        }
+    }
+
+    private void setProfiles(AdapterUsers adapterUsers) {
+        for(User user : users){
+            Log.d("TAG", "userImage: "+user);
+            mySocket.getProfileImage(user.getUnique_id(), new MySocket.OnReceiveImage() {
+                @Override
+                public void OnReceive(JSONObject jsonObject) {
+                    try {
+                        Log.d("TAG", "GET_IMAGE2: "+jsonObject.getString("uid"));
+                        byte[] image_bytes = Base64.decode(jsonObject.getString("image"), Base64.DEFAULT);
+                        //if(adapterUsers!=null)
+                          //  adapterUsers.setImageUser(user.getUnique_id(), image_bytes);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

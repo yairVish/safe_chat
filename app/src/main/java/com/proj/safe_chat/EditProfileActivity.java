@@ -82,10 +82,13 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
     }
 
     private void onEdit() {
-        Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        String base64Image= android.util.Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        String base64Image = "Empty";
+        if(profileImage.getDrawable()!=null) {
+            Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            base64Image = android.util.Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        }
 
 
         JSONObject jsonObject = new JSONObject();
@@ -110,6 +113,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
             }
         };
         thread.start();
+        finish();
     }
 
     private void onProfileImage(){

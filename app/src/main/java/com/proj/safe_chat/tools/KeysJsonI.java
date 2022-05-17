@@ -29,4 +29,5 @@ public interface KeysJsonI {
     String MESSAGE_ONE_TIME_VALUE = "messageOneTime";
     String EDIT_VALUE = "edit";
     String GET_IMAGE = "getImage";
+    String OK_IMAGE = "okImage";
 }

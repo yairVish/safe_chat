@@ -27,7 +27,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MySocket implements KeysJsonI{
     private Socket socket;
@@ -38,11 +40,11 @@ public class MySocket implements KeysJsonI{
     private String myKey = "";
     private Context context;
     private NoteViewModel noteViewModel;
-    private OnReceiveJson onReceiveJson;
     public static String idChat="";
+    private Map<String, OnReceiveImage> onReceiveImage = new HashMap<>();
 
-    public interface OnReceiveJson{
-        void onReceive(JSONObject jsonObject);
+    public interface OnReceiveImage{
+        void OnReceive(JSONObject jsonObject);
     }
 
 
@@ -68,6 +70,27 @@ public class MySocket implements KeysJsonI{
             outputStream.write(ByteBuffer.allocate(4).putInt(bytes.length).array());
             outputStream.write(bytes);
         }
+    }
+
+    public void getProfileImage(String uid, OnReceiveImage onReceiveImage){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(TYPE_KEY, GET_IMAGE);
+            jsonObject.put(UID_KEY, uid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    send(jsonObject.toString().getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };thread.start();
+        this.onReceiveImage.put(uid, onReceiveImage);
     }
 
     public void listen(){
@@ -99,8 +122,6 @@ public class MySocket implements KeysJsonI{
     }
 
     private void conditionsByJson(JSONObject jsonObject) throws Exception {
-        if(onReceiveJson!=null)
-            onReceiveJson.onReceive(jsonObject);
         String myType = (String) jsonObject.get(TYPE_KEY);
         if(myType.equals(P_AND_A_VALUE)){
             JSONObject jsonMyPublicKey;
@@ -146,6 +167,15 @@ public class MySocket implements KeysJsonI{
                 noteViewModel.insertMessage(new Message(bodys.get(i).substring(1,bodys.get(i).length()-1), toS, fromS
                         ,false,Long.parseLong(times.get(i))));
             }
+        }else if(myType.equals(OK_IMAGE)){
+            Log.d("TAG", "OK_IMAGE1: ");
+            if(onReceiveImage!=null){
+                //onReceiveImage.OnReceive(jsonObject); //here
+                try {
+                    onReceiveImage.get(jsonObject.getString("uid")).OnReceive(jsonObject);
+                    onReceiveImage.remove(jsonObject.getString("uid"));
+                }catch (Exception e){}
+            }
         }
         myType = "";
     }
@@ -168,11 +198,6 @@ public class MySocket implements KeysJsonI{
 
     public void setChanged(boolean changed) {
         isChanged = changed;
-    }
-
-
-    public void setOnReceiveJson(OnReceiveJson onReceiveJson) {
-        this.onReceiveJson = onReceiveJson;
     }
 
     public boolean isJson(String test) {

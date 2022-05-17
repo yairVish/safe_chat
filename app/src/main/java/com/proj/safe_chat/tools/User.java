@@ -7,6 +7,7 @@ public class User {
     private String unique_id;
     private String email;
     private String token;
+    private byte[] profileImage = null;
 
     public User(String name, String unique_id, String email, String token) {
         this.name = name;
@@ -45,6 +46,14 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
     }
 
     @NonNull

@@ -1,7 +1,11 @@
 package com.proj.safe_chat.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> implements KeysJsonI {
     private Context context;
     private List<User> users;
@@ -54,7 +60,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         this.context = context;
         this.users = users;
         this.myUid=myUid;
-        mySocket = MySocketSingleton.getMySocket();
+        this.mySocket = MySocketSingleton.getMySocket();
         noteViewModel= ViewModelProviders.of((FragmentActivity) context).get(NoteViewModel.class);
     }
     @Override
@@ -64,29 +70,34 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
     }
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position){
-        mySocket.setOnReceiveJson(new MySocket.OnReceiveJson() {
-            @Override
-            public void onReceive(JSONObject jsonObject) {
-
-            }
-        });
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(TYPE_KEY, GET_IMAGE);
-            jsonObject.put(UID_KEY, users.get(position).getUnique_id());
-        } catch (JSONException e) {
-            e.printStackTrace();
+        byte[] image_bytes = users.get(position).getProfileImage();
+        if(image_bytes!=null){
+            Bitmap bitmap = BitmapFactory.decodeByteArray(image_bytes , 0, image_bytes.length);
+            holder.profileImage.setImageBitmap(bitmap);
         }
-        Thread thread = new Thread() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    mySocket.send(jsonObject.toString().getBytes());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                mySocket.getProfileImage(users.get(position).getUnique_id(), new MySocket.OnReceiveImage() {
+                    @Override
+                    public void OnReceive(JSONObject jsonObject) {
+                        try {
+                            Log.d("TAG", "GET_IMAGE2: "+jsonObject.getString("uid"));
+                            byte[] image_bytes = Base64.decode(jsonObject.getString("image"), Base64.DEFAULT);
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(image_bytes , 0, image_bytes.length);
+                            ((Activity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.profileImage.setImageBitmap(bitmap);
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
-        };thread.start();
+        });thread.start();
         noteViewModel.getAllMessagesNotShow(users.get(position).getUnique_id())
                 .observe((LifecycleOwner) context, new Observer<List<Message>>() {
             @Override
@@ -147,6 +158,16 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         return users.get(position);
     }
 
+    public void setImageUser(String uid, byte[] image_bytes) {
+        for(int i = 0; i < users.size(); i++){
+            if(users.get(i).getUnique_id().equals(uid)){
+                users.get(i).setProfileImage(image_bytes);
+                notifyItemChanged(i, Boolean.FALSE);
+                break;
+            }
+        }
+    }
+
     @Override
     public int getItemCount() {
         return users.size();
@@ -159,7 +180,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView textName,textEmail,badgeText;
-        public ImageView profileImage;
+        public CircleImageView profileImage;
         public LinearLayout badgeBack;
         public ViewHolder(View itemView, OnItemClickListener listener){
             super(itemView);
