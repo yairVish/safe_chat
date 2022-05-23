@@ -51,7 +51,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("192.168.5.60", 5644);
+                    Socket socket = new Socket("192.168.5.59", 5644);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){

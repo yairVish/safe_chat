@@ -2,9 +2,12 @@ package com.proj.safe_chat.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -80,24 +84,30 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
             public void run() {
                 mySocket.getProfileImage(users.get(position).getUnique_id(), new MySocket.OnReceiveImage() {
                     @Override
-                    public void OnReceive(JSONObject jsonObject) {
-                        try {
-                            Log.d("TAG", "GET_IMAGE2: "+jsonObject.getString("uid"));
-                            byte[] image_bytes = Base64.decode(jsonObject.getString("image"), Base64.DEFAULT);
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(image_bytes , 0, image_bytes.length);
-                            ((Activity)context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    holder.profileImage.setImageBitmap(bitmap);
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void OnReceive(Bitmap bitmap) {
+                        ((Activity)context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.profileImage.setImageBitmap(bitmap);
+                            }
+                        });
                     }
                 });
             }
         });thread.start();
+
+
+        holder.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    setImageDialog(((BitmapDrawable) holder.profileImage.getDrawable()).getBitmap());
+                }catch (Exception e){
+                    setImageDialog(null);
+                }
+            }
+        });
+
         noteViewModel.getAllMessagesNotShow(users.get(position).getUnique_id())
                 .observe((LifecycleOwner) context, new Observer<List<Message>>() {
             @Override
@@ -147,6 +157,22 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
                 }
             }
         });
+    }
+
+    private void setImageDialog(Bitmap bitmap) {
+        Dialog dialog;
+        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+        final View mView = LayoutInflater.from(context).inflate(R.layout.resize_image_dialog, null);
+        mBuilder.setView(mView);
+        ImageView ivPhoto = mView.findViewById(R.id.ivPhoto);
+        if(bitmap!=null) {
+            Drawable d = new BitmapDrawable(context.getResources(), bitmap);
+            ivPhoto.setBackground(d);
+        }else{
+            ivPhoto.setBackground(((Activity)context).getResources().getDrawable(R.drawable.account_circle));
+        }
+        dialog = mBuilder.create();
+        dialog.show();
     }
 
     public User getUserById(String uid,int position){

@@ -2,6 +2,8 @@ package com.proj.safe_chat.tools;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,7 +46,7 @@ public class MySocket implements KeysJsonI{
     private Map<String, OnReceiveImage> onReceiveImage = new HashMap<>();
 
     public interface OnReceiveImage{
-        void OnReceive(JSONObject jsonObject);
+        void OnReceive(Bitmap bitmap);
     }
 
 
@@ -172,7 +174,9 @@ public class MySocket implements KeysJsonI{
             if(onReceiveImage!=null){
                 //onReceiveImage.OnReceive(jsonObject); //here
                 try {
-                    onReceiveImage.get(jsonObject.getString("uid")).OnReceive(jsonObject);
+                    byte[] image_bytes = Base64.decode(jsonObject.getString("image"), Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image_bytes , 0, image_bytes.length);
+                    onReceiveImage.get(jsonObject.getString("uid")).OnReceive(bitmap);
                     onReceiveImage.remove(jsonObject.getString("uid"));
                 }catch (Exception e){}
             }

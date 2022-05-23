@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,8 @@ import java.util.List;
 import static com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig.activeChat;
 import static com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig.idUser;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ChatActivity extends AppCompatActivity implements KeysJsonI {
     private TextView textUsername;
     private EditText editTextChat;
@@ -42,6 +45,7 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
     private MySocket mySocket;
     private NoteViewModel noteViewModel;
     private List<Boolean> bDates = new ArrayList<>();
+    private CircleImageView profileImage;
     private RecyclerView recyclerView;
     private AdapterMessage adapterMessage;
     private List<Message>messages=new ArrayList<>();
@@ -53,6 +57,7 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
         btnSend = findViewById(R.id.btn_send);
         recyclerView=findViewById(R.id.recyclerView);
         editTextChat=findViewById(R.id.text_send);
+        profileImage=findViewById(R.id.profile_image);
 
         String my_uid = getIntent().getStringExtra("my_unique_id");
         String o_uid = getIntent().getStringExtra("other_unique_id");
@@ -74,6 +79,24 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mySocket = MySocketSingleton.getMySocket();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mySocket.getProfileImage(o_uid, new MySocket.OnReceiveImage() {
+                    @Override
+                    public void OnReceive(Bitmap bitmap) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                profileImage.setImageBitmap(bitmap);
+                            }
+                        });
+                    }
+                });
+            }
+        });thread.start();
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -3,6 +3,7 @@ package com.proj.safe_chat;
 import static com.proj.safe_chat.tools.KeysJsonI.TYPE_KEY;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -79,6 +80,22 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
                 onEdit();
             }
         });
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mySocket.getProfileImage(getIntent().getExtras().getString("uid"), new MySocket.OnReceiveImage() {
+                    @Override
+                    public void OnReceive(Bitmap bitmap) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                profileImage.setImageBitmap(bitmap);
+                            }
+                        });
+                    }
+                });
+            }
+        });thread.start();
     }
 
     private void onEdit() {
@@ -192,7 +209,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
                     final Uri resultUri = UCrop.getOutput(data);
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-                        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,320,320, true);
+                        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,520,520, true);
                         profileImage.setImageBitmap(bitmapResized);
                     } catch (IOException e) {
                         e.printStackTrace();

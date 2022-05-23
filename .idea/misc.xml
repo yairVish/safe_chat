@@ -9,13 +9,14 @@
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/drawable/circle.xml" value="0.1345" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/drawable/dialog_chat_end.xml" value="0.1505" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/drawable/edit_text_style.xml" value="0.1605" />
-        <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/activity_chat.xml" value="0.2" />
+        <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/activity_edit_profile.xml" value="0.22" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/activity_start.xml" value="0.18" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/item_participants.xml" value="0.22" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/my_chat_item.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/other_chat_item.xml" value="0.33" />
+        <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/resize_image_dialog.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/layout/sign_up_dialog.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/97252/AndroidStudioProjects/safe_chat/app/src/main/res/menu/menu.xml" value="0.20416666666666666" />
       </map>
