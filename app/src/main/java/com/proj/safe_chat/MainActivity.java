@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.proj.safe_chat.adapter.AdapterUsers;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private List<User> users = new ArrayList<>();
     private List<String> tokens = new ArrayList<>();
     private NoteViewModel noteViewModel;
+    private final String TAG = getClass().getName();
 
 
     @Override
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
         mySocket = MySocketSingleton.getMySocket();
+        mySocket.setContext(this);
 
         String myName = getIntent().getStringExtra("name");
         String myEmail = getIntent().getStringExtra("email");
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         user = new User(myName, myUnique_id, myEmail, "");
 
         try {
-            sendGetAllRequest();
+            getTokenMessaging();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -92,42 +95,53 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         thread.start();
     }
 
-    private void sendGetAllRequest() throws JSONException {
+    private void getTokenMessaging() throws JSONException {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
+                        String token = "";
                         if (!task.isSuccessful()) {
+                            token = "NOT_DEFINE";
                             Log.w("TAG", "Fetching FCM registration token failed", task.getException());
-                            return;
                         }
 
                         // Get new FCM registration token
-                        String token = task.getResult();
+                        if(!token.equals("NOT_DEFINE"))
+                            token = task.getResult();
 
                         // Log and toast
-                        JSONObject jsonObject = new JSONObject();
-                        try {
-                            jsonObject.put(TYPE_KEY, GET_ALL_VALUE);
-                            jsonObject.put(UID_KEY, user.getUnique_id());
-                            jsonObject.put(TOKEN_KEY, token);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Thread thread = new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    mySocket.send(jsonObject.toString().getBytes());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        };
-                        thread.start();
+                        sendGetAllRequest(token);
                         Log.d("TAG", "token: " + token);
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailureToken: ");
+                sendGetAllRequest("NOT_DEFINE");
+            }
+        });
+    }
+    private void sendGetAllRequest(String token){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(TYPE_KEY, GET_ALL_VALUE);
+            jsonObject.put(UID_KEY, user.getUnique_id());
+            jsonObject.put(TOKEN_KEY, token);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    mySocket.send(jsonObject.toString().getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
     }
 
     private void receive(byte[] bytes) throws JSONException {

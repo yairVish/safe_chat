@@ -6,7 +6,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,6 +44,9 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
 
     @Override
     protected void onStart(){
+        mySocket = MySocketSingleton.getMySocket();
+        if(mySocket!=null)
+            mySocket.setContext(this);
         Log.d("TAG", "start: ");
         super.onStart();
 
@@ -51,7 +56,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("192.168.5.59", 5644);
+                    Socket socket = new Socket("192.168.5.59", 9786);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){
@@ -64,6 +69,23 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    try{
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new AlertDialog.Builder(context)
+                                        .setTitle("Connection Error")
+                                        .setCancelable(false)
+                                        .setMessage("Lost connection to the server. Try again.")
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finish();
+                                                System.exit(0);
+                                            }
+                                        }).show();
+                            }
+                        });
+                    }catch (Exception e2){}
                 }
             }
         };thread.start();

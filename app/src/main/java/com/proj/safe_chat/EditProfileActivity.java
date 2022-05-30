@@ -1,9 +1,6 @@
 package com.proj.safe_chat;
 
-import static com.proj.safe_chat.tools.KeysJsonI.TYPE_KEY;
-
 import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,6 +60,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
 
         Log.d("TAG", "help11111: ");
         mySocket = MySocketSingleton.getMySocket();
+        mySocket.setContext(this);
         editName.setText(getIntent().getExtras().getString("name"));
         editEmail.setText(getIntent().getExtras().getString("email"));
 
@@ -85,7 +82,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
             public void run() {
                 mySocket.getProfileImage(getIntent().getExtras().getString("uid"), new MySocket.OnReceiveImage() {
                     @Override
-                    public void OnReceive(Bitmap bitmap) {
+                    public void OnReceive(Bitmap bitmap, String uid) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

@@ -2,12 +2,13 @@ package com.proj.safe_chat.tools;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -22,9 +23,6 @@ import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -46,7 +44,7 @@ public class MySocket implements KeysJsonI{
     private Map<String, OnReceiveImage> onReceiveImage = new HashMap<>();
 
     public interface OnReceiveImage{
-        void OnReceive(Bitmap bitmap);
+        void OnReceive(Bitmap bitmap, String uid);
     }
 
 
@@ -117,6 +115,22 @@ public class MySocket implements KeysJsonI{
                         isChanged = true;
                     } catch (Exception e) {
                         e.printStackTrace();
+                    ((Activity)(context)).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new AlertDialog.Builder(context)
+                                        .setTitle("Connection Error")
+                                        .setCancelable(false)
+                                        .setMessage("Lost connection to the server. Try again.")
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                ((Activity)(context)).finish();
+                                                System.exit(0);
+                                            }
+                                        }).show();
+                            }
+                        });
+                        break;
                     }
                 }
             }
@@ -176,7 +190,8 @@ public class MySocket implements KeysJsonI{
                 try {
                     byte[] image_bytes = Base64.decode(jsonObject.getString("image"), Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(image_bytes , 0, image_bytes.length);
-                    onReceiveImage.get(jsonObject.getString("uid")).OnReceive(bitmap);
+                    onReceiveImage.get(jsonObject.getString("uid")).OnReceive
+                            (bitmap, jsonObject.getString("uid"));
                     onReceiveImage.remove(jsonObject.getString("uid"));
                 }catch (Exception e){}
             }
@@ -202,6 +217,14 @@ public class MySocket implements KeysJsonI{
 
     public void setChanged(boolean changed) {
         isChanged = changed;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     public boolean isJson(String test) {

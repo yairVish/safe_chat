@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -79,13 +78,14 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mySocket = MySocketSingleton.getMySocket();
+        mySocket.setContext(this);
 
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 mySocket.getProfileImage(o_uid, new MySocket.OnReceiveImage() {
                     @Override
-                    public void OnReceive(Bitmap bitmap) {
+                    public void OnReceive(Bitmap bitmap, String uid) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

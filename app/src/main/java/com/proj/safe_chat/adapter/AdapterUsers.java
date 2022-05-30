@@ -1,6 +1,5 @@
 package com.proj.safe_chat.adapter;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -8,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +22,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.proj.safe_chat.MainActivity;
 import com.proj.safe_chat.R;
 import com.proj.safe_chat.roomsql.Message;
 import com.proj.safe_chat.roomsql.NoteViewModel;
@@ -35,11 +30,7 @@ import com.proj.safe_chat.tools.MySocket;
 import com.proj.safe_chat.tools.MySocketSingleton;
 import com.proj.safe_chat.tools.User;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -84,11 +75,21 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
             public void run() {
                 mySocket.getProfileImage(users.get(position).getUnique_id(), new MySocket.OnReceiveImage() {
                     @Override
-                    public void OnReceive(Bitmap bitmap) {
+                    public void OnReceive(Bitmap bitmap, String uid) {
                         ((Activity)context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 holder.profileImage.setImageBitmap(bitmap);
+                                int bytes = bitmap.getByteCount();
+                                ByteBuffer buffer = ByteBuffer.allocate(bytes);
+                                bitmap.copyPixelsToBuffer(buffer);
+
+                                byte[] array = buffer.array();
+                                for(User user : users){
+                                    if(user.getUnique_id().equals(uid))
+                                        user.setProfileImage(array);
+                                        break;
+                                }
                             }
                         });
                     }
@@ -167,9 +168,9 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         ImageView ivPhoto = mView.findViewById(R.id.ivPhoto);
         if(bitmap!=null) {
             Drawable d = new BitmapDrawable(context.getResources(), bitmap);
-            ivPhoto.setBackground(d);
+            ivPhoto.setImageDrawable(d);
         }else{
-            ivPhoto.setBackground(((Activity)context).getResources().getDrawable(R.drawable.account_circle));
+            ivPhoto.setImageDrawable(((Activity)context).getResources().getDrawable(R.drawable.account_circle_big));
         }
         dialog = mBuilder.create();
         dialog.show();
