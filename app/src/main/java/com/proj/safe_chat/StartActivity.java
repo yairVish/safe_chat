@@ -56,7 +56,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("192.168.5.59", 9786);
+                    Socket socket = new Socket("194.195.243.174", 5644);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){
@@ -123,7 +123,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
             @Override
             public void onClick(View v) {
                 JSONObject obj = new JSONObject();
-                String email = editName.getText().toString();
+                String email = editName.getText().toString().trim();
                 String password = editPassword.getText().toString();
                 MessageDigest digest = null;
                 try {
@@ -184,7 +184,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                     obj.put(TYPE_KEY, SIGN_UP_SEND_VALUE);
                     obj.put(NAME_KEY, editTextName.getText().toString());
                     obj.put(PASSWORD_KEY, sHash);
-                    obj.put(EMAIL_KEY, editTextEmail.getText().toString());
+                    obj.put(EMAIL_KEY, editTextEmail.getText().toString().trim());
                     noteViewModel.deleteAllNotesUser();
                     noteViewModel.insertUser(new NoteUser(editTextEmail.getText().toString(), sHash));
                     Thread thread = new Thread(){

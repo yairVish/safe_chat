@@ -1,0 +1,299 @@
+@startuml
+
+title __SAFE_CHAT.APP's Class Diagram__\n
+
+  namespace com.proj.safe_chat {
+    class com.proj.safe_chat.BuildConfig {
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    class com.proj.safe_chat.ChatActivity {
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    class com.proj.safe_chat.EditProfileActivity {
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    class com.proj.safe_chat.MainActivity {
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    class com.proj.safe_chat.StartActivity {
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace adapter {
+      class com.proj.safe_chat.adapter.AdapterMessage {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace adapter {
+      class com.proj.safe_chat.adapter.AdapterUsers {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace encrypt {
+      class com.proj.safe_chat.encrypt.CalculateKey {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace encrypt {
+      class com.proj.safe_chat.encrypt.Encryption {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      interface com.proj.safe_chat.firebase_noti.APIService {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.Client {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.Data {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.MyFirebaseIdService {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.MyResponse {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.NotificationModel {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.RootModel {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.SendNotification {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace firebase_noti {
+      class com.proj.safe_chat.firebase_noti.Token {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.Message {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      interface com.proj.safe_chat.roomsql.NoteDao {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.NoteDao_Impl {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      abstract class com.proj.safe_chat.roomsql.NoteDatabase {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.NoteDatabase_Impl {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.NoteRepository {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.NoteUser {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace roomsql {
+      class com.proj.safe_chat.roomsql.NoteViewModel {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace tools {
+      interface com.proj.safe_chat.tools.KeysJsonI {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace tools {
+      class com.proj.safe_chat.tools.MyCameraApi {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace tools {
+      class com.proj.safe_chat.tools.MySocket {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace tools {
+      class com.proj.safe_chat.tools.MySocketSingleton {
+      }
+    }
+  }
+  
+
+  namespace com.proj.safe_chat {
+    namespace tools {
+      class com.proj.safe_chat.tools.User {
+      }
+    }
+  }
+  
+
+  com.proj.safe_chat.ChatActivity .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.ChatActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.proj.safe_chat.ChatActivity o-- com.proj.safe_chat.adapter.AdapterMessage : adapterMessage
+  com.proj.safe_chat.ChatActivity o-- com.proj.safe_chat.tools.MySocket : mySocket
+  com.proj.safe_chat.ChatActivity o-- com.proj.safe_chat.roomsql.NoteViewModel : noteViewModel
+  com.proj.safe_chat.EditProfileActivity .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.EditProfileActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.proj.safe_chat.EditProfileActivity o-- com.proj.safe_chat.tools.MyCameraApi : cameraApi
+  com.proj.safe_chat.EditProfileActivity o-- com.proj.safe_chat.tools.MySocket : mySocket
+  com.proj.safe_chat.MainActivity .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.MainActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.proj.safe_chat.MainActivity o-- com.proj.safe_chat.tools.MySocket : mySocket
+  com.proj.safe_chat.MainActivity o-- com.proj.safe_chat.roomsql.NoteViewModel : noteViewModel
+  com.proj.safe_chat.MainActivity o-- com.proj.safe_chat.tools.User : user
+  com.proj.safe_chat.StartActivity .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.StartActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.proj.safe_chat.StartActivity o-- com.proj.safe_chat.tools.MySocket : mySocket
+  com.proj.safe_chat.StartActivity o-- com.proj.safe_chat.roomsql.NoteViewModel : noteViewModel
+  com.proj.safe_chat.adapter.AdapterMessage -up-|> androidx.recyclerview.widget.RecyclerView.Adapter
+  com.proj.safe_chat.adapter.AdapterUsers .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.adapter.AdapterUsers -up-|> androidx.recyclerview.widget.RecyclerView.Adapter
+  com.proj.safe_chat.adapter.AdapterUsers o-- com.proj.safe_chat.adapter.AdapterUsers.OnItemClickListener : mListener
+  com.proj.safe_chat.adapter.AdapterUsers o-- com.proj.safe_chat.tools.MySocket : mySocket
+  com.proj.safe_chat.adapter.AdapterUsers o-- com.proj.safe_chat.roomsql.NoteViewModel : noteViewModel
+  com.proj.safe_chat.firebase_noti.MyFirebaseIdService -up-|> com.google.firebase.messaging.FirebaseMessagingService
+  com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig -up-|> com.google.firebase.messaging.FirebaseMessagingService
+  com.proj.safe_chat.firebase_noti.RootModel o-- com.proj.safe_chat.firebase_noti.Data : data
+  com.proj.safe_chat.firebase_noti.RootModel o-- com.proj.safe_chat.firebase_noti.NotificationModel : notification
+  com.proj.safe_chat.firebase_noti.SendNotification o-- com.proj.safe_chat.firebase_noti.APIService : apiService
+  com.proj.safe_chat.firebase_noti.SendNotification o-- com.proj.safe_chat.firebase_noti.Data : data
+  com.proj.safe_chat.roomsql.NoteDao_Impl .up.|> com.proj.safe_chat.roomsql.NoteDao
+  com.proj.safe_chat.roomsql.NoteDatabase -up-|> androidx.room.RoomDatabase
+  com.proj.safe_chat.roomsql.NoteDatabase_Impl -up-|> com.proj.safe_chat.roomsql.NoteDatabase
+  com.proj.safe_chat.roomsql.NoteDatabase_Impl o-- com.proj.safe_chat.roomsql.NoteDao : _noteDao
+  com.proj.safe_chat.roomsql.NoteRepository o-- com.proj.safe_chat.roomsql.NoteDao : noteDao
+  com.proj.safe_chat.roomsql.NoteViewModel -up-|> androidx.lifecycle.AndroidViewModel
+  com.proj.safe_chat.roomsql.NoteViewModel o-- com.proj.safe_chat.roomsql.NoteRepository : repository
+  com.proj.safe_chat.tools.MySocket .up.|> com.proj.safe_chat.tools.KeysJsonI
+  com.proj.safe_chat.tools.MySocket o-- com.proj.safe_chat.roomsql.NoteViewModel : noteViewModel
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml

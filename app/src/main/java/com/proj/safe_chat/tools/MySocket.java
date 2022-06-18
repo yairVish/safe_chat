@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
@@ -107,6 +108,7 @@ public class MySocket implements KeysJsonI{
                         String result = new String(bytes).trim();
                         if(!isJson(result)){
                             // TODO: 8/10/2021 decrypt...
+                            Log.d("TAG", "myKey2022: "+myKey);
                             bytes = new Encryption(myKey).decrypt(bytes);
                             result = new String(bytes).trim();
                         }
@@ -195,6 +197,24 @@ public class MySocket implements KeysJsonI{
                     onReceiveImage.remove(jsonObject.getString("uid"));
                 }catch (Exception e){}
             }
+        }else if(myType.equals(SUCCESS_EDIT)){
+            try {
+                ((Activity)context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //((Activity)context).finish();
+                    }
+                });
+            }catch (Exception e){}
+        }else if(myType.equals(ERROR_EMAIL_ALREADY_EXISTS)){
+            try {
+                ((Activity)context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, ERROR_EMAIL_ALREADY_EXISTS, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }catch (Exception e){}
         }
         myType = "";
     }

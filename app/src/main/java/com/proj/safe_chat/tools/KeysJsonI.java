@@ -30,4 +30,6 @@ public interface KeysJsonI {
     String EDIT_VALUE = "edit";
     String GET_IMAGE = "getImage";
     String OK_IMAGE = "okImage";
+    String ERROR_EMAIL_ALREADY_EXISTS = "errorEmailAlreadyExists";
+    String SUCCESS_EDIT = "successEdit";
 }
