@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -96,6 +97,11 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
     }
 
     private void onEdit() {
+        if(editName.getText().toString().trim().length() <=0
+                || editEmail.getText().toString().trim().length() <=0){
+            Toast.makeText(this, "Field cannot be empty",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String base64Image = "Empty";
         if(profileImage.getDrawable()!=null) {
             Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
@@ -127,7 +133,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
             }
         };
         thread.start();
-        finish();
+        //finish();
     }
 
     private void onProfileImage(){
@@ -192,6 +198,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
                         mImageUri = data.getData();
                     }
                         if(mImageUri == null){
+                            Log.d(TAG, "cameraApi: "+cameraApi);
                             Bitmap photo = BitmapFactory.decodeFile(cameraApi.getCurrentPhotoPath());
                             mImageUri = cameraApi.getImageUri(getApplicationContext(), photo);
                         }

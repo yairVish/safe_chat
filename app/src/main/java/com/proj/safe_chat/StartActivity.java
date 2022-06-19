@@ -41,6 +41,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
     private EditText editName, editPassword;
     private Button btnSignIn, btnSignUp;
     private NoteViewModel noteViewModel;
+    private AlertDialog dialogSignUp;
 
     @Override
     protected void onStart(){
@@ -56,7 +57,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("194.195.243.174", 5644);
+                    Socket socket = new Socket("194.195.243.174", 9786);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){
@@ -167,14 +168,20 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
         EditText editTextEmail =mView.findViewById(R.id.edit_text_email);
         Button dBtnSignUp=mView.findViewById(R.id.btn_sign_up);
         mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.show();
+        dialogSignUp = mBuilder.create();
+        dialogSignUp.show();
 
         dBtnSignUp.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 String pass=editTextNPass.getText().toString();
+                if(pass.trim().length() <=0
+                        || editTextName.getText().toString().trim().length() <=0
+                        || editTextEmail.getText().toString().trim().length() <=0){
+                    Toast.makeText(context, "Field cannot be empty",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 JSONObject obj = new JSONObject();
                 try {
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -224,6 +231,8 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                         e.printStackTrace();
                     }
                     context.startActivity(intent);
+                    if(dialogSignUp!=null)
+                        dialogSignUp.dismiss();
                     finish();
                 }
             });
@@ -247,6 +256,8 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    if(dialogSignUp!=null)
+                        dialogSignUp.dismiss();
                     context.startActivity(intent);
                     finish();
                 }

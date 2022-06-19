@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                 intent.putExtra("uid", user.getUnique_id());
                 intent.putExtra("name", user.getName());
                 intent.putExtra("email", user.getEmail());
-                startActivity(intent);
+                startActivityForResult(intent, 103);
                 return true;
             case R.id.logout:
                 JSONObject jsonObject = new JSONObject();
@@ -284,6 +284,22 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 103) {
+            if(resultCode == RESULT_OK) {
+                try {
+                    String newName = data.getStringExtra("newName");
+                    Log.d(TAG, "newName: "+newName);
+                    if(!newName.trim().equals(""))
+                        user.setName(newName);
+                    String newEmail = data.getStringExtra("newEmail");
+                    if(!newEmail.trim().equals(""))
+                        user.setEmail(newEmail);
+                }catch (Exception e){}
+            }
         }
     }
 }

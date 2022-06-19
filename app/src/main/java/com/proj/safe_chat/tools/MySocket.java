@@ -1,8 +1,11 @@
 package com.proj.safe_chat.tools;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -202,7 +205,15 @@ public class MySocket implements KeysJsonI{
                 ((Activity)context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //((Activity)context).finish();
+                        Intent intent = new Intent();
+                        try {
+                            intent.putExtra("newName", jsonObject.getString("newName"));
+                            intent.putExtra("newEmail", jsonObject.getString("newEmail"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        ((Activity)context).setResult(RESULT_OK, intent);
+                        ((Activity)context).finish();
                     }
                 });
             }catch (Exception e){}
@@ -211,7 +222,18 @@ public class MySocket implements KeysJsonI{
                 ((Activity)context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Intent intent = new Intent();
+                        try {
+                            intent.putExtra("newName", jsonObject.getString("newName"));
+                            Log.d("TAG", "newName: "+jsonObject.getString("newName"));
+                            intent.putExtra("newEmail", jsonObject.getString("newEmail"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        ((Activity)context).setResult(RESULT_OK, intent);
+                        ((Activity)context).finish();
                         Toast.makeText(context, ERROR_EMAIL_ALREADY_EXISTS, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "name changed", Toast.LENGTH_SHORT).show();
                     }
                 });
             }catch (Exception e){}
