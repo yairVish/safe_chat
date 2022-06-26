@@ -10,12 +10,13 @@ public class SendNotification {
     APIService apiService;
     private Data data;
     private String token;
+    //בנאי המחלקה
     public SendNotification(String token,Data data){
         this.token=token;
         this.data=data;
         apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     }
-
+    //פונקציה השולחת את ההתראה
     public void sendNotification(){
         RootModel rootModel
                 = new RootModel(token,null,data);

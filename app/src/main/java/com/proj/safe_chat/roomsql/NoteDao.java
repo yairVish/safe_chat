@@ -8,6 +8,8 @@ import androidx.room.Update;
 
 import java.util.List;
 
+//ממשק המנהל את השאילתות למסד הנתונים המקומי
+
 @Dao
 public interface NoteDao {
     @Insert

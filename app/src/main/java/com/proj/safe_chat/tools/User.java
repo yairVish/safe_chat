@@ -2,6 +2,7 @@ package com.proj.safe_chat.tools;
 
 import androidx.annotation.NonNull;
 
+//אובייקט המייצג משתמש כללי באפליקציה
 public class User {
     private String name;
     private String unique_id;
@@ -9,6 +10,7 @@ public class User {
     private String token;
     private byte[] profileImage = null;
 
+    //בנאי המחלקה
     public User(String name, String unique_id, String email, String token) {
         this.name = name;
         this.unique_id = unique_id;
@@ -16,6 +18,7 @@ public class User {
         this.token = token;
     }
 
+    //פעולוץ GET SET סטנדרטיות
     public String getName() {
         return name;
     }
@@ -56,6 +59,7 @@ public class User {
         this.profileImage = profileImage;
     }
 
+    //להדפסת משתמש בLOG
     @NonNull
     @Override
     public String toString() {

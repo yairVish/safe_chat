@@ -20,12 +20,13 @@ public class CalculateKey {
     private BigInteger acceptedKey;
     private String theRealKey="";
 
+    //בנאי המחלקה
     public CalculateKey(String acceptedKey, String otherPublicKey){
         this.acceptedKey = new BigInteger(acceptedKey);
         this.otherPublicKey = new BigInteger(otherPublicKey);
         privateKey=random();
     }
-
+    //מחשב מפתח ציבורי ומפתח סופי - מחזיר את המפתח הציבורי בפונקציה כערך כדי לשלוח את המםתח הציבורי שלו לצד השני
     public JSONObject calculate() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         myPublicKey = BigInteger.valueOf(3).modPow(privateKey,acceptedKey);
@@ -36,19 +37,7 @@ public class CalculateKey {
         return jsonObject;
     }
 
-    public void generateAcceptedKey(){
-            acceptedKey = random();
-            myPublicKey = BigInteger.valueOf(3).modPow(privateKey,acceptedKey);
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("type", "PublicKeyAndAcceptedKey");
-                obj.put("otherPublicKey", myPublicKey);
-                obj.put("acceptedKey", acceptedKey);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-    }
-
+    //מגריל מפתח על גבי ספרות גדולות - bigInteger
     private BigInteger random(){
         BigInteger maxLimit = new BigInteger("99999");
         BigInteger minLimit = new BigInteger("10000");
@@ -64,14 +53,17 @@ public class CalculateKey {
         return res;
     }
 
+    //שינוי מפתח מוסכם
     public void setAcceptedKey(String acceptedKey) {
         this.acceptedKey = new BigInteger(acceptedKey);
     }
 
+    //שינוי מפתח ציבורי של הצד השני
     public void setOtherPublicKey(String otherPublicKey) {
         this.otherPublicKey = new BigInteger(otherPublicKey);
     }
 
+    //קבלת מפתח סופי
     public String getTheRealKey() {
         return theRealKey;
     }

@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+//מסך התחלה
 public class StartActivity extends AppCompatActivity implements KeysJsonI {
     private MySocket mySocket = null;
     private Context context;
@@ -43,6 +44,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
     private NoteViewModel noteViewModel;
     private AlertDialog dialogSignUp;
 
+    //נקרא כאשר האקטיביטי מתחיל
     @Override
     protected void onStart(){
         mySocket = MySocketSingleton.getMySocket();
@@ -57,7 +59,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
                 noteViewModel = ViewModelProviders.of(StartActivity.this).get(NoteViewModel.class);
                 NoteUser noteUser = noteViewModel.getNoteUser();
                 try {
-                    Socket socket = new Socket("194.195.243.174", 9786);
+                    Socket socket = new Socket("192.168.5.59", 9786);
                     mySocket = new MySocket(socket, StartActivity.this);
                     mySocket.listen();
                     if(noteUser!=null){
@@ -92,6 +94,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
         };thread.start();
     }
 
+    //נקרא כאשר האקטיביטי נוצר
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,6 +163,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
         });
     }
 
+    //יוצר את פופאפ ההרשמה
     private void setDialog(){
         final AlertDialog.Builder mBuilder = new AlertDialog.Builder(StartActivity.this);
         final View mView = LayoutInflater.from(StartActivity.this).inflate(R.layout.sign_up_dialog, null);
@@ -209,6 +213,7 @@ public class StartActivity extends AppCompatActivity implements KeysJsonI {
         });
     }
 
+    //בודק אם MYSOCKET קיבל מידע חדש הרלוונטי אליו - כאן זה בעניין ההרשמה
     private void receive(byte[] bytes) throws JSONException {
         String result = new String(bytes);
         JSONObject jsonObject = null;

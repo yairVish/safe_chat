@@ -43,14 +43,17 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
     private String myUid;
     private MySocket mySocket;
 
+    //ממשק האחראי לקבל האם אחד הitems נלחץ
     public interface OnItemClickListener{
         void onItemClick(int position);
     }
 
+    //הגדרת הממשק
     public void setOnItemClickListener(OnItemClickListener listener){
         mListener=listener;
     }
 
+    //בנאי המחלקה
     public AdapterUsers(Context context, List<User> users, String myUid){
         this.context = context;
         this.users = users;
@@ -58,11 +61,14 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         this.mySocket = MySocketSingleton.getMySocket();
         noteViewModel= ViewModelProviders.of((FragmentActivity) context).get(NoteViewModel.class);
     }
+    //נקרא כאשר יש ViewHolder חדש
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_participants,parent,false);
         return new AdapterUsers.ViewHolder(view, mListener);
     }
+
+    //נקרא עבור כל Item
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position){
         byte[] image_bytes = users.get(position).getProfileImage();
@@ -160,6 +166,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         });
     }
 
+    //יוצר את הפופאפ שמציג את תמונת הפרופיל
     private void setImageDialog(Bitmap bitmap) {
         Dialog dialog;
         final AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
@@ -176,6 +183,7 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         dialog.show();
     }
 
+    //מחזיר משתמש על פי id
     public User getUserById(String uid,int position){
         for(User user : users){
             if(user.getUnique_id().equals(uid)){
@@ -185,26 +193,19 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.ViewHolder> 
         return users.get(position);
     }
 
-    public void setImageUser(String uid, byte[] image_bytes) {
-        for(int i = 0; i < users.size(); i++){
-            if(users.get(i).getUnique_id().equals(uid)){
-                users.get(i).setProfileImage(image_bytes);
-                notifyItemChanged(i, Boolean.FALSE);
-                break;
-            }
-        }
-    }
-
+    //מקבל את כמות הitems שצריך ליצור
     @Override
     public int getItemCount() {
         return users.size();
     }
 
+    //מחזיר את מיקום הitem
     @Override
     public long getItemId(int position) {
         return position;
     }
 
+    //מחזיק את האלמנטים הדרושים לitem
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView textName,textEmail,badgeText;
         public CircleImageView profileImage;

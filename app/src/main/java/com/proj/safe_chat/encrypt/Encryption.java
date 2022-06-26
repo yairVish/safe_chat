@@ -15,11 +15,13 @@ public class Encryption {
     private String keyStr = "";
     private SecretKey key;
 
+    //בנאי מחלקה
     public Encryption(String keyStr){
         this.keyStr = keyStr;
         key = new SecretKeySpec(keyStr.getBytes(), "AES");
     }
 
+    //מצפין את המידע
     public byte[] encrypt(byte[] bytes) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE,key);
@@ -27,6 +29,7 @@ public class Encryption {
         return bytes;
     }
 
+    //מפענח את המידע
     public byte[] decrypt(byte[] bytes) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE,key);

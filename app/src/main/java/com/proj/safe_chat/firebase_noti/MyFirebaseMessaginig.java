@@ -24,11 +24,13 @@ import java.util.Random;
 public class MyFirebaseMessaginig extends FirebaseMessagingService {
     public static boolean activeChat=false;
     public static String idUser="";
+    //נקרא כאשר מתקבלת התראה
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage){
         super.onMessageReceived(remoteMessage);
         showNotification(remoteMessage);
     }
+    //בונה את ההתראה מבחינת הUI
     private void showNotification( RemoteMessage remoteMessage){
         Uri defultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int idNote=getNotificationId();
@@ -62,6 +64,7 @@ public class MyFirebaseMessaginig extends FirebaseMessagingService {
             noti.notify(idNote, builder.build());
         }
     }
+    //מגריל ID להתראה כדי שיהיה ניתן להציג כמה התראות
     private static int getNotificationId() {
         Random rnd = new Random();
         return 100 + rnd.nextInt(9000);

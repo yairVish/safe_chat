@@ -2,6 +2,7 @@ package com.proj.safe_chat.firebase_noti;
 
 import com.google.gson.annotations.SerializedName;
 
+//האובייקט הכללי אותו שולחים כהתראה מחזיק מידע וTOKEN של המשתמש שצריך לקבל את ההתראה
 public class RootModel {
 
     @SerializedName("to") //  "to" changed to token
@@ -13,12 +14,14 @@ public class RootModel {
     @SerializedName("data")
     private Data data;
 
+    //בנאי המחלקה
     public RootModel(String token, NotificationModel notification, Data data) {
         this.token = token;
         this.notification = notification;
         this.data = data;
     }
 
+    //פעולות GET SET סטנדרטיות
     public String getToken() {
         return token;
     }

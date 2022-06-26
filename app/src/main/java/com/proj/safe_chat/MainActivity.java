@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+//מסך ראשי
 public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private MySocket mySocket;
     private User user;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
     private NoteViewModel noteViewModel;
     private final String TAG = getClass().getName();
 
-
+    //נקרא כאשר נוצר האקטיביטי
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         thread.start();
     }
 
+    //דואג לקבל TOKEN להתראות
     private void getTokenMessaging() throws JSONException {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
             }
         });
     }
+    //שולח בקשה לקבל את המשתמשים איתם ניתן לדבר
     private void sendGetAllRequest(String token){
         JSONObject jsonObject = new JSONObject();
         try {
@@ -144,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         thread.start();
     }
 
+    //בודק האם MYSOCKET קיבל מידע חדש ואם זה רלוונטי אליו
     private void receive(byte[] bytes) throws JSONException {
         String result = new String(bytes);
         JSONObject jsonObject = null;
@@ -242,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         }
     }
 
+    //לMENU
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -249,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
         return true;
     }
 
+    //מאזין אם אחד האפשרויות בMENU נלחץ
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -286,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements KeysJsonI {
                 return super.onOptionsItemSelected(item);
         }
     }
+    //מקבל Result מאקטיביטי אחר
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 103) {

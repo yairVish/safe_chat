@@ -5,6 +5,7 @@ import android.util.Log;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+//להגדרת הretrofit - ספרייה לשליחת בקשות HTTP
 public class Client {
     public static Retrofit retrofit=null;
     public static Retrofit getClient(String url){

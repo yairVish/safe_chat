@@ -38,7 +38,7 @@ import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+//מסך ערכית הפרופיל
 public class EditProfileActivity extends AppCompatActivity implements KeysJsonI {
     private final int PICK_IMAGE_REQUEST = 2004;
     private CircleImageView profileImage;
@@ -49,6 +49,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
     private MySocket mySocket;
     private final String TAG = getClass().getName();
 
+    //נקרא כאשר האקטיביטי נוצר
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +97,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
         });thread.start();
     }
 
+    //נקרא כאשר המשתמש לוחץ כי הוא מאשר לערוך את הפרופיל עם הפרטים ששם
     private void onEdit() {
         if(editName.getText().toString().trim().length() <=0
                 || editEmail.getText().toString().trim().length() <=0){
@@ -136,6 +138,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
         //finish();
     }
 
+    //נקרא כאשר נלחץ התמונת פרופיל לעריכה
     private void onProfileImage(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Choose");
@@ -173,6 +176,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
         alert11.show();
     }
 
+    //כאשר אושר אחד ההרשאות או שונה
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -186,6 +190,7 @@ public class EditProfileActivity extends AppCompatActivity implements KeysJsonI 
         }
     }
 
+    //מקבל result מאקטיביטים אחרים
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

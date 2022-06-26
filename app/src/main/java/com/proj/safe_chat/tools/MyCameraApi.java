@@ -25,10 +25,12 @@ public class MyCameraApi {
     private String currentPhotoPath;
     private int REQUEST_CODE;
 
+    //בנאי המחלקה
     public MyCameraApi(Context context) {
         this.context = context;
     }
 
+    //מתחיל את תהליך לקיחת התמונה בודק גם אם יש הרשאה מתאימה
     public int film(int REQUEST_CODE){
         this.REQUEST_CODE = REQUEST_CODE;
         if (ContextCompat
@@ -43,6 +45,7 @@ public class MyCameraApi {
         return REQUEST_CODE;
     }
 
+    //יוצר מהתמונה קובץ וURI
     private void dispatchTakePictureIntent(int REQUEST_CODE) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
@@ -60,6 +63,7 @@ public class MyCameraApi {
         }
     }
 
+    //יוצר מהתמונה קובץ - נקרא לdispatchTakePictureIntent
     public File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -76,6 +80,7 @@ public class MyCameraApi {
         return image;
     }
 
+    //מחזיר את הURI לקובץ התמונה
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -83,6 +88,7 @@ public class MyCameraApi {
         return Uri.parse(path);
     }
 
+    //פעולות GET SET סטנדרטיות
     public Context getContext() {
         return context;
     }

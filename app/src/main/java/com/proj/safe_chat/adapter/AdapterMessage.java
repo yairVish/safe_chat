@@ -21,12 +21,15 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
     private String myId;
     private List<Message> messages;
     private List<Boolean> bDates;
+
+    //בנאי המחלקה
     public AdapterMessage(Context context,List<Message>messages, String myId){
         this.context=context;
         this.myId=myId;
         this.messages=messages;
     }
 
+    //נקרא כאשר יש ViewHolder חדש
     @Override
     public AdapterMessage.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType==-1){
@@ -37,7 +40,7 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             return new ViewHolder(view);
         }
     }
-
+    //נקרא עבור כל Item
     @Override
     public void onBindViewHolder(@NonNull AdapterMessage.ViewHolder holder, int position) {
         holder.message.setText(messages.get(position).getBody().trim());
@@ -55,7 +58,7 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             holder.titleDate.setVisibility(View.GONE);
         }
     }
-
+    //מגדיר type לכל item ככה שיהיה הודעות צאט אפורות (של מי ששולח לך) והודעות צאט ירוקות (מה שאתה שולח)
     @Override
     public int getItemViewType(int position) {
         if (myId.equals(messages.get(position).getFromId().trim())) {
@@ -64,12 +67,13 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             return -1;
         }
     }
-
+    //מקבל את כמות הitems שצריך ליצור
     @Override
     public int getItemCount() {
         return messages.size();
     }
 
+    //מעדכן איפה כותרת התאריך צריכה להיות (כותרת תאריך אחת לכל יום)
     public void setBDates(List<Boolean>bDates){
         this.bDates=bDates;
     }
@@ -77,12 +81,13 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
         this.messages = messages;
         notifyDataSetChanged();
     }
-
+    //מחזיר את מיקום הitem
     @Override
     public long getItemId(int position) {
         return position;
     }
 
+    //מחזיק את האלמנטים הדרושים לitem
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView message;
         public TextView clock,titleDate;

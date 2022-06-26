@@ -15,6 +15,7 @@ public class NoteViewModel extends AndroidViewModel {
         repository = new NoteRepository(application);
     }
 
+    //פעולות גישור לשאילתות בDao - המחלקה אחראית לגשר בין הUI לDATA
     public void insertUser(NoteUser note) {
         repository.insertUser(note);
     }

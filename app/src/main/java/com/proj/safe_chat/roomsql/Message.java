@@ -4,6 +4,8 @@ package com.proj.safe_chat.roomsql;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+//אובייקט המייצג את ההודעה
+
 @Entity(tableName = "messages")
 public class Message {
     @PrimaryKey(autoGenerate = true)
@@ -19,6 +21,7 @@ public class Message {
 
     private long time;
 
+    //בנאי המחלקה
     public Message(String body, String toId, String fromId, boolean show, long time) {
         this.body = body;
         this.toId = toId;
@@ -27,6 +30,7 @@ public class Message {
         this.time = time;
     }
 
+    //פעולות GET SET סטנדרטיות
     public void setId(int id) {
         this.id = id;
     }

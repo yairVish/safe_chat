@@ -1,5 +1,7 @@
 package com.proj.safe_chat.tools;
 
+//ממשק המחזיק קבועים
+
 public interface KeysJsonI {
     String TYPE_KEY = "type";
     String AUTO_SIGN_IN_KEY = "oto";

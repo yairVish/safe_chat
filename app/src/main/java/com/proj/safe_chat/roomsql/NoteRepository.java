@@ -15,6 +15,7 @@ public class NoteRepository {
         noteDao = database.noteDao();
     }
 
+    //פעולות גישור לשאילתות בDao
     public void insertUser(NoteUser note) {
         new InsertNoteUserAsyncTask(noteDao).execute(note);
     }
@@ -49,6 +50,7 @@ public class NoteRepository {
     }
 
 
+    //מבצע task כדי לא להפריע לmainThread
 
     private static class InsertNoteUserAsyncTask extends AsyncTask<NoteUser, Void, Void> {
         private NoteDao noteDao;

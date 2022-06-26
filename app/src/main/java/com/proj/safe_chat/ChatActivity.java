@@ -37,6 +37,7 @@ import static com.proj.safe_chat.firebase_noti.MyFirebaseMessaginig.idUser;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+//מסך הצאט
 public class ChatActivity extends AppCompatActivity implements KeysJsonI {
     private TextView textUsername;
     private EditText editTextChat;
@@ -48,6 +49,8 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
     private RecyclerView recyclerView;
     private AdapterMessage adapterMessage;
     private List<Message>messages=new ArrayList<>();
+
+    //נקרא כאשר האקטיביטי נוצר
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,6 +178,7 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
         });
     }
 
+    // נקרא כאשר האקטיביטי מתחיל מיוכד כדי למנוע התראות לצאט הזה ספציפית
     @Override
     protected void onStart() {
         super.onStart();
@@ -184,6 +188,7 @@ public class ChatActivity extends AppCompatActivity implements KeysJsonI {
         Log.d("TAG", "idChat: "+idChat);
     }
 
+    //נקרא כאשר האקטיביטי מפסיק - אך לא נהרס מיועד כי לאשר המשך התראות
     @Override
     protected void onStop() {
         super.onStop();

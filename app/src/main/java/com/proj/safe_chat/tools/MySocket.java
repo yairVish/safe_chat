@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//המחלקה באה לפשט את הפעולות שעושה הsocket הסטנדרטי
 public class MySocket implements KeysJsonI{
     private Socket socket;
     ArrayList<byte[]> listOfStreams = new ArrayList();
@@ -47,11 +48,12 @@ public class MySocket implements KeysJsonI{
     public static String idChat="";
     private Map<String, OnReceiveImage> onReceiveImage = new HashMap<>();
 
+    //ממשק המאזין כאשר מתקבלת תמונת פרופיל
     public interface OnReceiveImage{
         void OnReceive(Bitmap bitmap, String uid);
     }
 
-
+    //בנאי המחלקה
     public MySocket(Socket socket, Context context) throws Exception {
         this.socket = socket;
         this.context = context;
@@ -61,6 +63,7 @@ public class MySocket implements KeysJsonI{
         noteViewModel = ViewModelProviders.of((FragmentActivity) context).get(NoteViewModel.class);
     }
 
+    //שולח את המידע לשרת
     public void send(byte[] bytes) throws Exception {
         Log.d("TAG", "myKey24: "+myKey);
         if(!myKey.equals("")) {
@@ -76,6 +79,7 @@ public class MySocket implements KeysJsonI{
         }
     }
 
+    //מגדיר את הממשק כcallback שמחכה לקבל את התמונה מהשרת
     public void getProfileImage(String uid, OnReceiveImage onReceiveImage){
         JSONObject jsonObject = new JSONObject();
         try {
@@ -97,6 +101,7 @@ public class MySocket implements KeysJsonI{
         this.onReceiveImage.put(uid, onReceiveImage);
     }
 
+    //מאזין למידע המגיע מהשרת
     public void listen(){
         Thread thread = new Thread() {
             @Override
@@ -142,6 +147,7 @@ public class MySocket implements KeysJsonI{
         };thread.start();
     }
 
+    //לוקח את המידע מהשרת ופועל לפי סט תנאים
     private void conditionsByJson(JSONObject jsonObject) throws Exception {
         String myType = (String) jsonObject.get(TYPE_KEY);
         if(myType.equals(P_AND_A_VALUE)){
@@ -240,11 +246,14 @@ public class MySocket implements KeysJsonI{
         }
         myType = "";
     }
+    //מחלק את הstring למערך
     private List<String> splitArrayByFiled(String filed, JSONObject jsonObject) throws JSONException {
         String singleStr=jsonObject.getString(filed).substring(1, jsonObject.getString(filed).length()-1);
         String [] str = singleStr.split(",");
         return Arrays.asList(str);
     }
+
+    //פעולות GET SET סטנדרטיות
     public byte[] readLast(){
         return this.listOfStreams.get(this.listOfStreams.size() - 1);
     }
@@ -269,6 +278,7 @@ public class MySocket implements KeysJsonI{
         this.context = context;
     }
 
+    //בודק האם המחרוזת יכולה להיות JSON
     public boolean isJson(String test) {
         try {
             new JSONObject(test);
